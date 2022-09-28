@@ -151,7 +151,7 @@ while 1 == 1:
     time.sleep( delay )
 
     # read counter from Digistump
-    power = readEnergy(device)
+    power = readEnergy()
     mqtt_conn.publish(topic_power, power )
 
 mqtt_conn.publish(topic_lwt,"OFF",0,True)
