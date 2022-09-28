@@ -92,7 +92,8 @@ def cb_mqtt_connect(client, userdata, flags, rc):
 def cb_mqtt_message(client, userdata, message):
     command = message.payload.decode("utf-8")
     if command == CMD_READENERGY:
-        energy = readEnergy()
+        power = readEnergy()
+        mqtt_conn.publish(topic_power, power )
 
 # connect to MQTT server
 def mqtt_connect():
