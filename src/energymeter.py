@@ -9,7 +9,7 @@ sys.path.append("..")
 
 
 # Read env variables
-delay = os.getenv("DELAY") or 300
+delay = int(os.getenv("DELAY")) or 300
 mqtt_host = os.getenv("MQTT_HOST") or "localhost"
 mqtt_topic = os.getenv("MQTT_TOPIC") or "/meter"
 mqtt_client = os.getenv("MQTT_CLIENT") or "energymeter"
@@ -132,7 +132,7 @@ def readEnergy(device):
         digiCounter = resetCounter(device)
         lastRead = time.time()
     else:
-        if debug: print('Power usage %d W, measurement period %d s' % (power, delay) )
+        if debug: print('Power usage %d W, measurement period %d s' % (power, deltaT) )
         digiCounter = result
         lastRead = now
 
@@ -145,19 +145,20 @@ if __name__ == "__main__":
     device = digi_connectDevice()
     count = digi_resetCounter(device)
     lastRead = time.time()
-    print('connected to Digistump device')
+    if debug: print('connected to Digistump device')
 
     # connect to MQTT broker
-    mqtt = mqtt.Client(mqtt_client)
-    mqtt.connect(mqtt_host)
-    print('MQTT connected to %s, using topic %s' % (mqtt_host, mqtt_topic) )
+    mqtt_conn = mqtt_connect()
 
     # main loop
     while 1 == 1:
 
-        # read counter from Digistump
-        power = readEnergy(device)
-        mqtt.publish(mqtt_topic + '/power', power )
-
         time.sleep( delay )
 
+        # read counter from Digistump
+        power = readEnergy(device)
+        mqtt_conn.publish(mqtt_topic + '/power', power )
+
+    mqtt_conn.publish(topic_lwt,"OFF",0,True)
+    mqtt_conn.loop_stop()
+    mqtt_conn.disconnect()
