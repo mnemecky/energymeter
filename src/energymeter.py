@@ -14,6 +14,7 @@ mqtt_host = os.getenv("MQTT_HOST") or "localhost"
 mqtt_topic = os.getenv("MQTT_TOPIC") or "/meter"
 mqtt_client = os.getenv("MQTT_CLIENT") or "energymeter"
 mqtt_lwt = os.getenv("MQTT_LWT") or "lwt"
+debug = os.getenv("DEBUG").lower() == "on" or os.getenv("DEBUG").lower() == "true"
 
 # MQTT topics
 topic = mqtt_topic + '/' + mqtt_client
