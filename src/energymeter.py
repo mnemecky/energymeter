@@ -82,11 +82,11 @@ def cb_mqtt_connect(client, userdata, flags, rc):
     if rc == 0:
         # connection succesfull
         client.connected_flag = True
-        if debug: print("debug: MQTT connection successfull")
+        if debug: print("MQTT connection successfull")
         client.subscribe(topic_cmd)
         client.publish(topic_lwt,"ON",0,True)
     else:
-        print("debug: MQTT connection failed, error ",rc)
+        print("MQTT connection failed, error ",rc)
 
 # callback on message
 def cb_mqtt_message(client, userdata, message):
@@ -105,7 +105,7 @@ def mqtt_connect():
     client.connect(mqtt_host)
 
     while not client.connected_flag:
-        if debug: print("debug: waiting for MQTT connection...")
+        if debug: print("waiting for MQTT connection...")
         time.sleep(1)
 
     # register message callback
@@ -128,10 +128,12 @@ def readEnergy():
     # the meter produces 1000 impulses per kWh
     power = ( result - digiCounter ) * ( 3600 / deltaT )
     if( power < 0 ):
+        if debug: print("got wrong power value, resetting counter")
         digiCounter = digi_resetCounter(device)
         lastRead = time.time()
+        power = 0
     else:
-        if debug: print('Power usage %d W, measurement period %d s' % (power, deltaT) )
+        if debug: print("power usage %d W, measurement period %d s" % (power, deltaT) )
         digiCounter = result
         lastRead = now
 
@@ -153,7 +155,8 @@ while 1 == 1:
 
     # read counter from Digistump
     power = readEnergy()
-    mqtt_conn.publish(topic_power, power )
+    if( power > 0):
+        mqtt_conn.publish(topic_power, power )
 
 mqtt_conn.publish(topic_lwt,"OFF",0,True)
 mqtt_conn.loop_stop()
