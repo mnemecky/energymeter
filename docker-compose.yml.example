@@ -1,0 +1,17 @@
+version: "3"
+services:
+    energymeter:
+        container_name: energymeter
+        image: mnemecky/energymeter
+        logging:
+            driver: "local"
+        restart: unless-stopped
+        volumes:
+            - /dev:/dev
+        privileged: true
+        environment:
+            MQTT_HOST: A.B.C.D
+            MQTT_TOPIC: "/topic"
+            MQTT_CLIENT: "energymeter"
+            DELAY: 300
+            DEBUG: "False"
